@@ -1,21 +1,23 @@
 [Unit]
 Description=Bluehood Bluetooth Neighborhood Monitor Daemon
-After=bluetooth.target
+After=network.target bluetooth.target
+Wants=bluetooth.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python -m bluehood.daemon
+User=root
+
+# If bluehood was installed into a virtualenv, set the full path to the binary:
+#   ExecStart=/opt/bluehood-venv/bin/bluehood
+# If installed system-wide (pip install), use:
+#   ExecStart=/usr/local/bin/bluehood
+ExecStart=/usr/local/bin/bluehood
+
 Restart=on-failure
 RestartSec=5
 
-# Security hardening
-NoNewPrivileges=false
-ProtectSystem=strict
-ProtectHome=read-only
-ReadWritePaths=/home/danny/.local/share/bluehood /tmp
-
-# Bluetooth requires some capabilities
-AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
+# Data directory - adjust if you want a different location
+Environment=BLUEHOOD_DATA_DIR=/var/lib/bluehood
 
 [Install]
 WantedBy=multi-user.target
